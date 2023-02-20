@@ -84,4 +84,17 @@ if st.button("Calculate"):
         f"Your Cumulative GPA is {calculate_cgpa(grade, credit, previous_cgpa, previous_credit):.2f}"
     )
 
-st.write("Made with ❤️ by [Siddhesh Agarwal](https://github.com/Siddhesh-Agarwal)")
+
+st.markdown(
+    "Made with ❤️ by [Siddhesh Agarwal](https://github.com/Siddhesh-Agarwal)"
+)
+st.write(
+    """
+    <style>
+        footer {
+            visibility: hidden;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
