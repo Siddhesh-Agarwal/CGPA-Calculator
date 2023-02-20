@@ -18,9 +18,13 @@ grade_to_point = {
 grades = list(grade_to_point.keys())
 
 
-def calculate_cgpa(grade, credit, previous_cgpa=0, previous_credit=0):
-    grade = np.array([grade_to_point[g] for g in grade])
-    credit = np.array(credit)
+def calculate_cgpa(
+    grade: np.array,
+    credit: np.array,
+    previous_cgpa: float = 0,
+    previous_credit: float = 0,
+):
+    # grade = np.array([grade_to_point[g] for g in grade])
     total_credit = credit.sum() + previous_credit
     total_grade = (grade * credit).sum() + previous_cgpa * previous_credit
     return total_grade / total_credit
@@ -55,27 +59,26 @@ number_of_subjects = st.number_input(
 )
 
 
-grade = []
-credit = []
+grade = np.array([0] * number_of_subjects)
+credit = np.array([0] * number_of_subjects)
 for i in range(number_of_subjects):
     st.subheader(f"Subject #{i+1}")
     cols = st.columns(2)
-    grade.append(
+    grade[i] = grade_to_point[
         cols[0].selectbox(
             label=f"Grade",
             options=grades,
             key=f"selectbox_{i}",
         )
-    )
-    credit.append(
-        cols[1].number_input(
-            label=f"Credit",
-            min_value=1.0,
-            max_value=10.0,
-            value=4.0,
-            step=0.5,
-            key=f"number_input_{i}",
-        )
+    ]
+
+    credit[i] = cols[1].number_input(
+        label=f"Credit",
+        min_value=1.0,
+        max_value=10.0,
+        value=4.0,
+        step=0.5,
+        key=f"number_input_{i}",
     )
 
 if st.button("Calculate"):
@@ -85,9 +88,7 @@ if st.button("Calculate"):
     )
 
 
-st.markdown(
-    "Made with ❤️ by [Siddhesh Agarwal](https://github.com/Siddhesh-Agarwal)"
-)
+st.markdown("Made with ❤️ by [Siddhesh Agarwal](https://github.com/Siddhesh-Agarwal)")
 st.write(
     """
     <style>
