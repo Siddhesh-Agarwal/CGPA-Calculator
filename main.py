@@ -1,5 +1,4 @@
 import streamlit as st
-import numpy as np
 
 st.set_page_config(
     page_title="CGPA Calculator",
@@ -26,14 +25,13 @@ grades = list(grade_to_point.keys())
 
 
 def calculate_cgpa(
-    grade: np.array,
-    credit: np.array,
+    grade_points: list[int],
+    credits: list[float],
     previous_cgpa: float = 0,
     previous_credit: float = 0,
 ):
-    # grade = np.array([grade_to_point[g] for g in grade])
-    total_credit = credit.sum() + previous_credit
-    total_grade = (grade * credit).sum() + previous_cgpa * previous_credit
+    total_credit = sum(credit) + previous_credit
+    total_grade = sum(grade_point * credit for grade_point, credit in zip(grade_points, credits)) + (previous_cgpa * previous_credit)
     return total_grade / total_credit
 
 
@@ -59,28 +57,26 @@ previous_credit = cols[1].number_input(
     min_value=0.0,
     value=0.0,
     step=0.5,
-)
+).__int__()
 number_of_subjects = st.number_input(
     label="Number of Subjects",
     help="Enter the number of subjects you are taking this semester",
     min_value=1,
     max_value=10,
     value=5,
-)
+).__int__()
 
-
-grade = np.array([0] * number_of_subjects)
-credit = np.array([0] * number_of_subjects)
+grade = [grades[0]] * number_of_subjects
+credit = [0.0] * number_of_subjects
 for i in range(number_of_subjects):
     st.subheader(f"Subject #{i+1}")
     cols = st.columns(2)
-    grade[i] = grade_to_point[
-        cols[0].selectbox(
+    grade[i] = cols[0].selectbox(
             label=f"Grade",
             options=grades,
-            key=f"selectbox_{i}",
-        )
-    ]
+            key=f"grade_{i}",
+            index=0,
+        ).__str__()
 
     credit[i] = cols[1].number_input(
         label=f"Credit",
@@ -88,24 +84,15 @@ for i in range(number_of_subjects):
         max_value=10.0,
         value=4.0,
         step=0.5,
-        key=f"number_input_{i}",
+        key=f"credit_{i}",
     )
 
 if st.button("Calculate"):
-    st.info(f"Your semester GPA is {calculate_cgpa(grade, credit):.2f}")
+    grade_points = [grade_to_point[x] for x in grade]
+    st.info(f"Your semester GPA is {calculate_cgpa(grade_points, credit):.2f}")
     st.success(
-        f"Your Cumulative GPA is {calculate_cgpa(grade, credit, previous_cgpa, previous_credit):.2f}"
+        f"Your Cumulative GPA is {calculate_cgpa(grade_points, credit, previous_cgpa, previous_credit):.2f}"
     )
 
 
 st.markdown("Made with ❤️ by [Siddhesh Agarwal](https://github.com/Siddhesh-Agarwal)")
-st.write(
-    """
-    <style>
-        footer {
-            visibility: hidden;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
